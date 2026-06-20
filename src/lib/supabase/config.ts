@@ -1,10 +1,17 @@
-const fallbackUrl = "https://cacetazepgiwntumvluw.supabase.co"
-const fallbackPublishableKey =
-  "sb_publishable_kXqtNFgSIdMYfUY7sjfjcw_fELBVm0O"
+function requiredEnvironmentVariable(name: string) {
+  const value = process.env[name]
 
-export const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? fallbackUrl
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
 
-export const supabasePublishableKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-  fallbackPublishableKey
+  return value
+}
+
+export const supabaseUrl = requiredEnvironmentVariable(
+  "NEXT_PUBLIC_SUPABASE_URL"
+)
+
+export const supabasePublishableKey = requiredEnvironmentVariable(
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+)
