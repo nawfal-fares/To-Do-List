@@ -11,6 +11,26 @@ export type AuthState = {
   message?: string
 }
 
+function getSignUpErrorMessage(error: {
+  code?: string
+  message: string
+  status?: number
+}) {
+  if (
+    error.code === "over_email_send_rate_limit" ||
+    error.status === 429 ||
+    error.message.toLowerCase().includes("email rate limit")
+  ) {
+    return "Confirmation emails are temporarily at capacity. Please try again in about an hour."
+  }
+
+  if (error.code === "user_already_exists") {
+    return "An account already exists for this email. Try signing in instead."
+  }
+
+  return "We couldn’t create your account. Please try again."
+}
+
 const authSchema = z.object({
   email: z.string().trim().email("Enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters."),
@@ -80,7 +100,7 @@ export async function signUp(
     options: { emailRedirectTo: `${origin}/auth/confirm` },
   })
 
-  if (error) return { error: error.message }
+  if (error) return { error: getSignUpErrorMessage(error) }
   if (data.session) redirect("/tasks")
 
   return {
